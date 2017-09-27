@@ -1,7 +1,7 @@
 from ldap3 import Server, Connection, AUTO_BIND_TLS_AFTER_BIND, SUBTREE, ALL_ATTRIBUTES, ALL, BASE
 import sys
 import argparse
- 
+
 server = "ldapad.nih.gov"
 port = 389
 user = 'nih\\BTRIS_Admin'
@@ -79,21 +79,19 @@ def printC(c):
 
 
 if __name__ == "__main__":
-    print (sys.argv[1:])
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", "--username", help="AD Admin User Name")
-    parser.add_argument("-p", "--password", help="AD Admin Password")
-    parser.add_argument("-H", "--host", help="the hostname/IP of the AD server")
-    parser.add_argument("-P", "--port", help="the port on which AD is listening, defaults to 389")
+    parser.add_argument("-u", "--username",   help="AD Admin User Name")
+    parser.add_argument("-p", "--password",   help="AD Admin Password")
+    parser.add_argument("-H", "--host",       help="the hostname/IP of the AD server")
+    parser.add_argument("-P", "--port",       help="the port on which AD is listening, defaults to 389")
     parser.add_argument("-m", "--membername", help="member of interest")
-    parser.add_argument("-g", "--group", help="group of interest")
-    parser.add_argument("-r", "--remove", action="store_true", help="remove user from group")
-    parser.add_argument("-a", "--add", action="store_true", help="add user to group")
-    parser.add_argument("-s", "--show", action="store_true", help="displays the user and/or group, overrides add and remove")
+    parser.add_argument("-g", "--group",      help="group of interest")
+    parser.add_argument("-r", "--remove",     action="store_true", help="remove user from group")
+    parser.add_argument("-a", "--add",        action="store_true", help="add user to group")
+    parser.add_argument("-s", "--show",       action="store_true", help="displays the user and/or group, overrides add and remove")
     parser.add_argument("-b", "--searchBase", help="Base DC specification")
     args = parser.parse_args()
 
-    print (args)
 
     if args.username is None or args.password is None or args.host is None or args.searchBase is None:
         print(parser.print_help())
