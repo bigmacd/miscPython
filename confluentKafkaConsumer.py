@@ -1,5 +1,4 @@
-from kafka import KafkaConsumer
-from kafka import errors as kerrors
+from confluent_kafka import Consumer, KafkaError
 import json
 import argparse
 import datetime
@@ -20,14 +19,12 @@ class logger(): # implements the document/mapping definition
 
 log = logger()
 
-def setup():
+def setup(options, topic):
     global consumer
     global runnable
     try:
-        consumer = KafkaConsumer(topic, 
-                                 group_id='test-consumer-group',
-                                 bootstrap_servers=[brokers])
-#        consumer.seek_to_beginning()
+        consumer = Consumer(options)
+        consumer.subscribe([topic])
         runnable = True
     except Exception as ex:
         print (json.dumps(log.error("Unable to connect to bootstrap server {0}, {1}".format(brokers, str(ex)))))
@@ -38,11 +35,15 @@ def main():
     global consumer
     global runnable
     while(runnable):
-        for message in consumer:
-            auditRecord = log.audit(message.topic,
-                                    message.key,
-                                    message.value)
-        print(json.dumps(auditRecord))        
+        message = consumer.poll()
+        if message is not None:
+            if not message.error():
+                auditRecord = log.audit(message.topic(),
+                                        message.key().decode('utf-8'),
+                                        message.value().decode('utf-8'))
+                print(json.dumps(auditRecord))
+        else:
+            print(json.dumps(log.error("Poller received an empty message")))
 
 
 if __name__ == "__main__":
@@ -54,7 +55,15 @@ if __name__ == "__main__":
     brokers = args.broker
     topic = args.topic
 
+    options = {
+        'bootstrap.servers': brokers,
+        'group.id': 'test-consumer-group',
+        'default.topic.config': { 'auto.offset.reset': 'smallest'}
+    }
+
+    setup(options, topic)
     while runnable is False:
-        setup()
         time.sleep(30) # seconds
+        setup(options, topic)
     main()
+    consumer.close()

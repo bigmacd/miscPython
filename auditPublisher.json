@@ -1,0 +1,230 @@
+
+//##################  Create the index and set the mappings  ########################
+
+//# create the index
+curl -u 'elastic:changeme' -XPUT 'myservername:9200/audits?pretty' -H 'Content-Type: application/json' -d'
+{
+    "settings" : {
+        "index" : {
+            "number_of_shards" : 3,
+            "number_of_replicas" : 2
+        }
+    }
+}
+'
+
+//# mapping for audits
+curl -u 'elastic:changeme' -PUT 'myservername:9200/audits/_mapping/audit' -H 'Content-Type: application/json' -d'
+{
+    "properties": {
+        "topic": { "type": "text" },
+        "key": { "type": "text" },
+        "value": { 
+          "type": "object",
+          "enabled": false
+         },
+        "timestamp": { 
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss"
+        }
+    }
+}'
+
+
+//# end of index/mapping
+//###########################################################################
+
+
+//# Get the mappings:
+curl -u 'elastic:changeme' -PUT 'myservername:9200/audits/_mapping?pretty'
+
+
+//# To delete the index:
+curl -u 'elastic:changeme' -XDELETE 'myservername:9200/audits'
+
+
+//# everything?
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/audits/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match_all" : {  }
+    }
+}
+'
+
+// Let's do an insert
+curl -u 'elastic:changeme' -s -XPOST 'myservername:9200/audits/audit' -H 'Content-Type: application/json' -d'
+{
+    "protocolIds": [
+      18787
+    ],
+    "protocolNumbers": [
+      "BTRIS-TEST-03"
+    ],
+    "subjectIds": [
+      1000000013657190,
+      1000000013657200,
+      1000000013772420,
+      1000000013036190,
+      1000000011871340,
+      1000000010226520,
+      1000000011367470,
+      1000000009615780,
+      1000000010225610,
+      1000000011875670,
+      1000000009612090,
+      1000000009230120,
+      1000000008418440,
+      1000000009229410,
+      1000000008417480,
+      1000000008789320,
+      1000000010982120,
+      1000000010606850,
+      1000000011878070,
+      1000000012300470,
+      1000000009235950,
+      1000000012308140,
+      1000000009994230,
+      1000000012218010,
+      1000000010225850,
+      1000000010606940,
+      1000000010470840,
+      1000000009617590,
+      1000000008801210,
+      1000000009071900,
+      1000000009209090,
+      1000000009973330,
+      1000000009223570
+    ],
+    "customSubjectListIds": [],
+    "type": {
+      "id": 4,
+      "name": "Lab",
+      "promptConfig": {
+        "title": "Laboratory Report",
+        "subtitle": "Enter report criteria to further constrain results.",
+        "prompts": [
+          {
+            "name": "collectedDateRange",
+            "type": "date-range",
+            "default": {
+              "start": null,
+              "end": null
+            },
+            "config": {
+              "label": "Collected Date Range"
+            }
+          },
+          {
+            "name": "labs",
+            "type": "red",
+            "conceptCode": "C90150",
+            "default": [],
+            "config": {
+              "plural": "Labs",
+              "singular": "Lab"
+            }
+          },
+          {
+            "name": "blindedResults",
+            "type": "number-select",
+            "default": 0,
+            "config": {
+              "label": "Blinded Results",
+              "options": [
+                {
+                  "display": "Hide",
+                  "value": 0
+                },
+                {
+                  "display": "Show",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "id": 112,
+    "ReportInstanceVersion": 2,
+    "promptValues": {
+      "collectedDateRange": {
+        "start": null,
+        "end": null
+      },
+      "labs": [
+        {
+          "conceptCode": "C2256149",
+          "preferredTerm": "Absolute Neutrophil Intravascular Count (ANC)"
+        },
+        {
+          "conceptCode": "C136622",
+          "preferredTerm": "Red Blood Cell (RBC) Hemoglobin (Hgb) Measurement Test"
+        },
+        {
+          "conceptCode": "C64796",
+          "preferredTerm": "Hematocrit (HCT) Test"
+        }
+      ],
+      "blindedResults": 0
+    },
+    "reportFormats": [
+      {
+        "id": 1,
+        "name": "Standard",
+        "type": "default"
+      },
+      {
+        "id": 2,
+        "name": "Pivot By Day Order Set",
+        "type": "pivot default"
+      },
+      {
+        "id": 3,
+        "name": "Pivot By Day Order Set Detail1",
+        "type": "pivot"
+      },
+      {
+        "id": 4,
+        "name": "Pivot By Day Order Set Detail2",
+        "type": "pivot"
+      },
+      {
+        "id": 5,
+        "name": "Pivot By Day",
+        "type": "pivot"
+      },
+      {
+        "id": 6,
+        "name": "Pivot By Day Time",
+        "type": "pivot"
+      },
+      {
+        "id": 7,
+        "name": "Pivot By Day Time UOM",
+        "type": "pivot"
+      }
+    ],
+    "reportInstanceId": 112,
+    "run_date": "10/13/2017 9:35:54 AM",
+    "run_time": "00:00:00.0510051",
+    "user": "iamuser"
+  }'
+
+
+
+
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/audits/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "sort": [
+        { "_timestamp": { "order" : "asc" }}
+    ],
+    "query": {
+        "match_all" : {  }
+    }
+}
+'
+
+
+

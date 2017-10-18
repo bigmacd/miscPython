@@ -1,0 +1,292 @@
+
+//##################  Create the index and set the mappings  ########################
+
+//# create the index
+curl -u 'elastic:changeme' -XPUT 'myservername:9200/cr751?pretty' -H 'Content-Type: application/json' -d'
+{
+    "settings" : {
+        "index" : {
+            "number_of_shards" : 3,
+            "number_of_replicas" : 2
+        }
+    }
+}
+'
+
+//# mapping for activities
+curl -u 'elastic:changeme' -PUT 'myservername:9200/cr751/_mapping/activities' -H 'Content-Type: application/json' -d'
+{
+            "properties": {
+                "action": { "type": "text" },
+                "activity": { "type": "text" },
+                "timestamp": { 
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss"
+                }
+            }
+}'
+
+//# mapping for errors
+curl -u 'elastic:changeme' -PUT 'myservername:9200/cr751/_mapping/errors' -H 'Content-Type: application/json' -d'
+{
+            "properties": {
+                "cause": { "type": "text" },
+                "error": { "type": "text" },
+                "timestamp": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss"
+                }
+            }
+}'
+
+//# mapping for users
+curl -u 'elastic:changeme' -PUT 'myservername:9200/cr751/_mapping/users' -H 'Content-Type: application/json' -d'
+{
+            "properties": {
+                "message": { "type": "text"},
+                "user": { "type": "text" },
+                "timestamp": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss"
+                }
+            }
+}'
+
+
+//# end of index/mapping
+//###########################################################################
+
+
+//# Get the mappings:
+curl -u 'elastic:changeme' -PUT 'myservername:9200/cr751/_mapping?pretty'
+
+
+//# To delete the index:
+curl -u 'elastic:changeme' -XDELETE 'myservername:9200/cr751'
+
+
+//# everything?
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match_all" : {  }
+    }
+}
+'
+
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "sort": [
+        { "timestamp": { "order" : "asc" }}
+    ],
+    "query": {
+        "match_all" : {  }
+    }
+}
+'
+
+//# Get general activity messages
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "exists" : { "field" : "activity" }
+    }
+}
+'
+
+
+//# when we suspend a user for inactivity
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?size=5000&pretty' -H 'Content-Type: application/json' -d'
+{
+    "sort": [
+        { "timestamp": { "order" : "asc" }}
+    ],
+    "query": {
+        "match_phrase": {
+            "message": "Disabled due to account inactivity"
+        }
+    }
+}
+'
+
+
+//# when we detect a user's location has changed
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?size=5000&pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match_phrase": {
+            "message": "location change detected for user"
+        }
+    }
+}
+'
+
+
+//# when we remove a user from the Cognos AD group
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?size=5000&pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match_phrase": {
+            "message": "removing user from CC-BTRIS Cognos Users AD group"
+        }
+    }
+}
+'
+
+
+//# when we detect a user has previously been disabled
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?size=5000&pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match_phrase": {
+            "message": "previously suspended - re-enabling"
+        }
+    }
+}
+'
+
+
+//# Get items that were marked as errors
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "exists" : { "field" : "error" }
+    }
+}
+'
+
+//# Get items that were marked as exceptions
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "query": {
+        "match" : { "cause" : "Exception" }
+    }
+}
+'
+
+//# Get items that were marked as errors sorted by timestamp
+curl -u 'elastic:changeme' -s -XGET 'myservername:9200/cr751/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "sort": [
+        { "timestamp": { "order": "asc" }}
+    ],
+    "query": {
+        "exists" : { "field" : "error" }
+    }
+}
+'
+
+
+// Lets do some inserts (3 of them):
+curl -u 'elastic:changeme' -s -XPOST 'myservername:9200/cr751/activities' -H 'Content-Type: application/json' -d'
+{
+    "activity": "Total Users",
+    "action": "checking 2287 users",
+    "timestamp": "2017-09-28 08:53:53"
+}
+'
+curl -u 'elastic:changeme' -s -XPOST 'myservername:9200/cr751/users' -H 'Content-Type: application/json' -d'
+{
+    "user": "some loser",
+    "message": "always a loser",
+    "timestamp": "2017-09-28 08:53:53"
+}
+'
+curl -u 'elastic:changeme' -s -XPOST 'myservername:9200/cr751/errors' -H 'Content-Type: application/json' -d'
+{
+    "error": "what error?",
+    "cause": "test Exception",
+    "timestamp": "2017-09-28 08:53:53"
+}
+'
+
+
+
+
+
+
+// In Kibana, Discover->Open->Manage->Edit
+// For Inactive users: 
+{
+    "index": "cr751*",
+    "filter": [],
+    "highlight": {
+      "pre_tags": [
+        "@kibana-highlighted-field@"
+      ],
+      "post_tags": [
+        "@/kibana-highlighted-field@"
+      ],
+      "fields": {
+        "*": {}
+      },
+      "require_field_match": false,
+      "fragment_size": 2147483647
+    },
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "match_phrase": {
+              "message": "suspension recorded"
+            }
+          },
+          {
+            "range": {
+              "timestamp": {
+                "gt": "now-24h"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+
+
+// watcher
+curl -u 'elastic:changeme' -s -XPUT 'cc0dbtiselast:9200/_xpack/watcher/watch/log_error_watch' -H 'Content-Type: application/json' -d'
+{
+  "trigger" : {
+    "schedule" : { "interval" : "1h" } 
+  },
+  "input" : {
+    "search" : {
+      "request" : {
+        "indices" : [ "cr751" ],
+        "body" : {
+          "query" : {
+            "match" : { "cause": "Exception" }
+          }
+        }
+      }
+    }
+  },
+  "condition": {
+      "compare": { "ctx.payload.hits.total": { "gt": 0 }
+      }
+  },
+  "actions": {
+      "send_email": {
+          "email": {
+              "to": "cc-btrisdesktopsupport@mail.nih.gov",
+              "subject": "CR-751 Error(s) Detected",
+              "body" : "Encountered {{ctx.payload.hits.total}} Exceptions in the last hour!"
+          }
+      }
+  }
+}'
+
+// check watch history
+curl -u 'elastic:changeme' -s -XGET 'cc0dbtriselast:9200/.watcher-history*/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+  "query" : {
+    "match" : { "result.condition.met" : true }
+  }
+}'
+
+// test watcher
+curl -u 'elastic:changeme' -s -XPOST 'cc0dbtriselast:9200/_xpack/watcher/watch/log_error_watch/_execute'
+
+// delete the watch
+curl -u 'elastic:changeme' -s -XDELETE 'cc0dbtriselast:9200/_xpack/watcher/watch/log_error_watch'

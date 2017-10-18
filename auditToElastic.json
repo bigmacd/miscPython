@@ -1,0 +1,62 @@
+curl -u 'elastic:changeme' -s -XPOST 'myservername:9200/audits/audit' -H 'Content-Type: application/json' -d'
+{
+    "topic": "Preview_View",
+    "key": "1452",
+    "value": {
+        "protocolIds": [9777],
+        "protocolNumbers": ["00-AR-0222"],
+        "subjectIds": [1000000012268340, 1000000013067950, 1000000010240380],
+        "customSubjectListIds": [],
+        "type": {
+            "id": 4,
+            "name": "Lab",
+            "promptConfig": {
+                "title": "Laboratory Report",
+                "subtitle": "Enter report criteria to further constrain results.",
+                "prompts": [{
+                    "name": "collectedDateRange",
+                    "type": "date-range",
+                    "default": {
+                        "start": null,
+                        "end": null
+                    },
+                    "config": {
+                        "label": "Collected Date Range"
+                    }
+                }, {
+                    "name": "labs",
+                    "type": "red",
+                    "conceptCode": "C90150",
+                    "default": [],
+                    "config": {
+                        "plural": "Labs",
+                        "singular": "Lab"
+                    }
+                }]
+            }
+        },
+        "id": 1452,
+        "ReportInstanceVersion": 2,
+        "promptValues": {
+            "collectedDateRange": {
+                "start": null,
+                "end": null
+            },
+            "labs": [{
+                "conceptCode": "C64809",
+                "preferredTerm": "Sodium (NA) Test"
+            }],
+            "blindedResults": 0
+        },
+        "reportFormats": [{
+            "id": 1,
+            "name": "Standard",
+            "type": "default"
+        }],
+        "reportInstanceId": 1452,
+        "run_date": "10/17/2017 12:34:35 PM",
+        "run_time": "00:00:00.0500050",
+        "user": "iamuser"
+    },
+    "timestamp": "2017-10-17 12:34:35"
+}'
