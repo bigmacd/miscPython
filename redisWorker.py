@@ -15,7 +15,7 @@ def main(client, processing_queue, all_queue):
         if not job_id:
             continue
         # fetch the job data
-        job_data = client.hgetall("job:{0}".format(job_id))
+        job_data = client.hmget("job:{0}".format(job_id))
         # process the job
         process(job_id, job_data)
         # cleanup the job information from redis
