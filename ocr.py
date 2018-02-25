@@ -1,8 +1,9 @@
 import os
-from PIL image Image
+from PIL import Image
 import pytesseract
 import cv2
 from enum import Enum
+import argparse
 
 imageFiles = ['.jpg', '.jpeg', '.png', '.svg']
 pdfFiles = ['.pdf']
