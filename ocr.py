@@ -18,25 +18,31 @@ def main(args):
     if (getFileType(args.file) == FileType.IMAGETYPE):
         return processImageFile(args.file, args.program)
 
+def getFileExtension(file):
+    """
+    """
+    _, fileExtension = os.path.splitext(file)
+    return fileExtension
+
 
 def getFileType(file):
     """
     """
-    _, fileExtension = os.path.splitext(args.file)
+    fileExtension = getFileExtension(file)
     if (fileExtension in imageFiles):
         return FileType.IMAGETYPE
     if (fileExtension in pdfFiles):
         return FileType.PDFTYPE
 
 
-def processImageFile(file):
+def processImageFile(file, cmd=None):
     """
     """
-    image = cv2.imread(file, cmd=None)
-    gray - cv2.cvtColor(image, cv2.COLOR_BAYER_BG2GRAY)
+    image = cv2.imread(file)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    tempImage = "tempImage" + ext
-    cv2.imwrite("tempImage.xxx", gray)
+    tempImage = "tempImage" + getFileExtension(file)
+    cv2.imwrite(tempImage, gray)
 
     if cmd is not None:
         pytesseract.pytesseract.tesseract_cmd = cmd
