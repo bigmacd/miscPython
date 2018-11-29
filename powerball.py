@@ -32,11 +32,24 @@ prizes = {
 }
 
 
+def printEntry(prefix: str, entry: list):
+    numbers = list(entry[0])
+    numbers = sorted(numbers)
+    powerball = str(entry[1].copy().pop())
+    print(prefix.format(" ".join(str(n) for n in numbers), powerball))
+
+
 def checkNumbers(currentNumbers: list):
     for number, ticket in enumerate(myNumbers):
+
+        #numbers = list(ticket[0])
+        #print ("Checking your numbers: {0} {1}".format(" ".join(str(n) for n in numbers),
+        #                                               str(ticket[1].copy().pop())))
+        printEntry("Checking your numbers: {0} \tPowerball: {1}", ticket)
+
         powerballMatch = True if len(ticket[1] & currentNumbers[1]) else False
         matches = len(ticket[0] & currentNumbers[0])
-        print("Ticket {0}: won {1}".format(number + 1,
+        print("Ticket {0}: won {1}\n".format(number + 1,
                                            prizes[powerballMatch][matches]))
 
 
@@ -50,6 +63,9 @@ def getNumbers():
     # The site we will navigate into
     numbersPage = browser.get(url, verify=False)
 
+    # Output the date for these numbers
+    print("\n\nThe current date being checked is: {0}".format(numbersPage.soup.find("td", { "width": "141"}).contents[0]))
+
     # most recent
     b1 = numbersPage.soup.find("td", { "class": "whiteball"}).contents[0]
     b2 = b1.find_next("td", { "class": "whiteball"}).contents[0]
@@ -58,8 +74,15 @@ def getNumbers():
     b5 = b4.find_next("td", { "class": "whiteball"}).contents[0]
     powerball  = numbersPage.soup.find("td", { "class": "redball"}).contents[0]
 
+    retVal = [ { int(b1), int(b2), int(b3), int(b4), int(b5)}, { int(powerball) } ]
     
-    return [ { int(b1), int(b2), int(b3), int(b4), int(b5)}, { int(powerball) } ]
+    # Output what we found
+    #print("Current Numbers: {0} {1} {2} {3} {4} {5}".format(b1, b2, b3, b4, b5, powerball))
+    printEntry("Current Numbers: {0} \t\tPowerball: {1}\n", retVal)
+
+    return retVal
+
+    
 
 
 if __name__ == "__main__":
