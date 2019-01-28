@@ -55,24 +55,29 @@ def checkNumbers(currentNumbers: list):
 
 def getNumbers():
     # maybe there are others?
-    url = "https://www.valottery.com/SearchNumbers/powerball/"
+    #url = "https://www.valottery.com/SearchNumbers/powerball/"
+    url = "https://www.valottery.com/Data/Draw-Games/powerball"
 
     # Browser
     browser = mechanicalsoup.Browser(soup_config={ 'features': 'lxml'})
 
     # The site we will navigate into
     numbersPage = browser.get(url, verify=False)
-
+    # The main section in which we are interested
+    panel = numbersPage.soup.find("div", {"class": "right-panel"})
+    
     # Output the date for these numbers
-    print("\n\nThe current date being checked is: {0}".format(numbersPage.soup.find("td", { "width": "141"}).contents[0]))
+    print("\n\nThe current date being checked is: {0}".format(panel.find("h3", { "class": "title-display"}).contents[0]))
 
     # most recent
-    b1 = numbersPage.soup.find("td", { "class": "whiteball"}).contents[0]
-    b2 = b1.find_next("td", { "class": "whiteball"}).contents[0]
-    b3 = b2.find_next("td", { "class": "whiteball"}).contents[0]
-    b4 = b3.find_next("td", { "class": "whiteball"}).contents[0]
-    b5 = b4.find_next("td", { "class": "whiteball"}).contents[0]
-    powerball  = numbersPage.soup.find("td", { "class": "redball"}).contents[0]
+    numbers = panel.find("div", {"class": "selected-numbers"})
+    b1 = numbers.find("li").contents[0]
+    b2 = b1.find_next("li").contents[0]
+    b3 = b2.find_next("li").contents[0]
+    b4 = b3.find_next("li").contents[0]
+    b5 = b4.find_next("li").contents[0]
+
+    powerball  = numbers.find("span", { "id": "bonus-ball-display"}).contents[0]
 
     retVal = [ { int(b1), int(b2), int(b3), int(b4), int(b5)}, { int(powerball) } ]
     
