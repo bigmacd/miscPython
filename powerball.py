@@ -6,6 +6,11 @@ myNumbers = [
     [ { 2, 10, 15, 22, 23 }, { 4 } ],
     [ { 1, 14, 11, 19, 23 }, { 1 } ],
     [ { 2,  6,  9, 19, 27 }, { 2 } ],
+
+    [ { 26,  38,  40, 44, 52 }, { 23 } ],
+    [ { 19,  31,  33, 37, 45 }, { 19 } ],
+    [ { 5,  9,  19, 34, 44 }, { 23 } ],
+    [ { 6,  8,  12, 23, 38 }, { 2 } ],
 ]
 
 
@@ -49,6 +54,9 @@ def checkNumbers(currentNumbers: list):
 
         powerballMatch = True if len(ticket[1] & currentNumbers[1]) else False
         matches = len(ticket[0] & currentNumbers[0])
+        if powerballMatch == True:
+            print ("Powerball matches!") 
+        print ("Matched {0} numbers".format(matches))
         print("Ticket {0}: won {1}\n".format(number + 1,
                                            prizes[powerballMatch][matches]))
 
@@ -62,7 +70,7 @@ def getNumbers():
     browser = mechanicalsoup.Browser(soup_config={ 'features': 'lxml'})
 
     # The site we will navigate into
-    numbersPage = browser.get(url, verify=False)
+    numbersPage = browser.get(url) #, verify=False)
     # The main section in which we are interested
     panel = numbersPage.soup.find("div", {"class": "right-panel"})
     
