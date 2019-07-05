@@ -1,18 +1,18 @@
+import os
 import mechanicalsoup
+from gmail import Gmail
+from datetime import datetime, timedelta
+import time
 
 
 myNumbers = [
     [ {10, 15, 19, 23, 46 }, { 3 } ],
     [ { 2, 10, 15, 22, 23 }, { 4 } ],
     [ { 1, 14, 11, 19, 23 }, { 1 } ],
-    [ { 2,  6,  9, 19, 27 }, { 2 } ],
-
-    [ { 26,  38,  40, 44, 52 }, { 23 } ],
-    [ { 19,  31,  33, 37, 45 }, { 19 } ],
-    [ { 5,  9,  19, 34, 44 }, { 23 } ],
-    [ { 6,  8,  12, 23, 38 }, { 2 } ],
+    [ { 2,  6,  9, 19, 27 }, { 2 } ]
 ]
 
+outputMessage = ""
 
 # The key to this dictionary is whether the powerball was matched
 prizes = {
@@ -36,12 +36,17 @@ prizes = {
     }
 }
 
+def Print(msg):
+    global outputMessage
+    outputMessage += msg
+    outputMessage += "\n"
+
 
 def printEntry(prefix: str, entry: list):
     numbers = list(entry[0])
     numbers = sorted(numbers)
     powerball = str(entry[1].copy().pop())
-    print(prefix.format(" ".join(str(n) for n in numbers), powerball))
+    Print(prefix.format(" ".join(str(n) for n in numbers), powerball))
 
 
 def checkNumbers(currentNumbers: list):
@@ -55,10 +60,10 @@ def checkNumbers(currentNumbers: list):
         powerballMatch = True if len(ticket[1] & currentNumbers[1]) else False
         matches = len(ticket[0] & currentNumbers[0])
         if powerballMatch == True:
-            print ("Powerball matches!") 
-        print ("Matched {0} numbers".format(matches))
-        print("Ticket {0}: won {1}\n".format(number + 1,
-                                           prizes[powerballMatch][matches]))
+            Print ("Powerball matches!") 
+        Print ("Matched {0} numbers".format(matches))
+        Print("Ticket {0}: won {1}\n".format(number + 1,
+                                             prizes[powerballMatch][matches]))
 
 
 def getNumbers():
@@ -75,7 +80,7 @@ def getNumbers():
     panel = numbersPage.soup.find("div", {"class": "right-panel"})
     
     # Output the date for these numbers
-    print("\n\nThe current date being checked is: {0}".format(panel.find("h3", { "class": "title-display"}).contents[0]))
+    Print("The current date being checked is: {0}".format(panel.find("h3", { "class": "title-display"}).contents[0]))
 
     # most recent
     numbers = panel.find("div", {"class": "selected-numbers"})
@@ -95,8 +100,35 @@ def getNumbers():
 
     return retVal
 
-    
+
+def timeToWakeUp():
+    # if it is around just past midnight on Thursdays(3) or Sundays(6), go ahead and run
+    dayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    retVal = False
+    n = datetime.now()
+    print("found weekday = {0}, hour is: {1}".format(dayOfWeek[n.weekday()], n.hour))
+    if n.weekday() == 3 or n.weekday() == 6:
+        if n.hour == 0:
+            retVal = True
+    return retVal
 
 
 if __name__ == "__main__":
-    checkNumbers(getNumbers())
+    while True:
+        print("checking if it is time to wake up...")
+        if timeToWakeUp():
+            outputMessage = ""
+            print ("waking up!")
+            checkNumbers(getNumbers())
+            
+            g = Gmail()
+            g.setFrom('martin.cooley@gmail.com')
+            g.addRecipient('martin.cooley@gmail.com')
+            g.subject("Do you want to be a milli?")
+            g.message(outputMessage)
+            username = os.environ['username']
+            appkey = os.environ["appkey"]
+            g.setAuth(username, appkey)
+            g.send()
+        print ("sleeping for one hour")
+        time.sleep(60 * 60)
