@@ -10,12 +10,12 @@ class Gmail():
         self._subject = None
         self._message = None
         self._messageTemplate = """\
-            From: {0}
-            To: {1}
-            Subject: {2}
+From: {0}
+To: {1}
+Subject: {2}
 
-            {3}
-            """
+{3}
+"""
 
     def setFrom(self, you):
         self._you = you
@@ -33,11 +33,16 @@ class Gmail():
         self._message = message
 
 
+    def setAuth(self, username, password):
+        self._username = username
+        self._password = password
+
+
     def send(self):
         gm = smtplib.SMTP(self.mailserver)
         gm.starttls()
 
-        #gm.login(username,password)
+        gm.login(self._username, self._password)
         message = self._messageTemplate.format(self._you, ", ".join(self._to), self._subject, self._message)
         gm.sendmail(self._you, self._to, message)
         gm.quit()

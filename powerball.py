@@ -3,7 +3,7 @@ import mechanicalsoup
 from gmail import Gmail
 from datetime import datetime, timedelta
 import time
-
+import encodings.idna
 
 myNumbers = [
     [ {10, 15, 19, 23, 46 }, { 3 } ],
