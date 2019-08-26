@@ -117,14 +117,14 @@ def timeToWakeUp():
         retVal = True
         sleepTime = 96
     elif whereIam < 72:
-        sleepTime = 72 - (whereIam + 1)
+        sleepTime = 72 - (whereIam)
     elif whereIam < 144:
-        sleepTime = 144 - (whereIam + 1)
+        sleepTime = 144 - (whereIam)
     else:
-        sleepTime = (168 - (whereIam + 1)) + 72
-    //if n.weekday() == 3 or n.weekday() == 6:
-    //    if n.hour == 0:
-    //        retVal = True
+        sleepTime = (168 - (whereIam)) + 72
+    #if n.weekday() == 3 or n.weekday() == 6:
+    #    if n.hour == 0:
+    #        retVal = True
     return retVal, sleepTime
 
 
