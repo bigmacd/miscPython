@@ -1,15 +1,17 @@
-
+import math
 
 puzzle = [
-    [8, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 3, 6, 0, 0, 0, 0, 0],
-    [0, 7, 0, 0, 9, 0, 2, 0, 0],
-    [0, 5, 0, 0, 0, 7, 0, 0, 0],
-    [0, 0, 0, 0, 4, 5, 7, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 3, 0],
-    [0, 0, 1, 0, 0, 0, 0, 6, 8],
-    [0, 0, 8, 5, 0, 0, 0, 1, 0],
-    [0, 9, 0, 0, 0, 0, 4, 0, 0]
+    [0, 0, 0,  0, 0, 0,  2, 0, 0],
+    [0, 8, 0,  0, 0, 7,  0, 9, 0],
+    [6, 0, 2,  0, 0, 0,  5, 0, 0],
+
+    [0, 7, 0,  0, 6, 0,  0, 0, 0],
+    [0, 0, 0,  9, 0, 1,  0, 0, 0],
+    [0, 0, 0,  0, 2, 0,  0, 4, 0],
+
+    [0, 0, 5,  0, 0, 0,  6, 0, 3],
+    [0, 9, 0,  4, 0, 0,  0, 7, 0],
+    [0, 0, 6,  0, 0, 0,  0, 0, 0]
 ]
 
 def itFits(xAxis, yAxis, n, puzzle):
@@ -26,8 +28,8 @@ def itFits(xAxis, yAxis, n, puzzle):
 
     # now check the smaller grid
     # get the index of the upper left hand of the smaller grid
-    smallX = (xAxis//3) * 3
-    smallY = (yAxis//3) * 3
+    smallX = (math.floor(xAxis/3)) * 3
+    smallY = (math.floor(yAxis/3)) * 3
     for choice1 in range(0, 3):
         for choice2 in range(0, 3):
             if puzzle[smallX + choice1][smallY + choice2] == n:
