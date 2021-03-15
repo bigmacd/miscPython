@@ -1,4 +1,4 @@
-from kafka import KafkaClient, SimpleConsumer
+from kafka import KafkaConsumer
 from kafka import errors as kerrors
 import json
 import argparse
@@ -23,10 +23,10 @@ log = logger()
 def setup(brokers, topic, group):
     consumer = None
     try:
-        client = KafkaClient(brokers)
-	consumer = SimpleConsumer(client, 
-                                  group,
-                                  topic)
+        consumer = KafkaConsumer(topic,
+                                 bootstrap_servers = brokers,
+                                 client_id = "my_client_id")
+                                 #group_id = group)
     except Exception as ex:
         print (json.dumps(log.error("Unable to connect to bootstrap server {0}, {1}".format(brokers, str(ex)))))
 
@@ -38,8 +38,8 @@ def main(consumer, topic):
     if consumer is not None:
         for message in consumer:
             auditRecord = log.audit(topic,
-                                    message.message.key,
-                                    message.message.value)
+                                    message.key,
+                                    message.value)
         print(json.dumps(auditRecord))        
 
 
